@@ -10,18 +10,16 @@ class WelcomeTopTextsWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          height: 100,
-          width: 100,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            color: Colors.black,
-          ),
+        Image.asset(
+          'lib/assets/helm_logo.png',
+          height: 70,
+          width: 70,
         ),
         const SizedBox(height: 10),
         const Text(
           AppStrings.welcomeHelm,
           style: AppTextStyles.title,
+          maxLines: 2,
         ),
         const Text(
           AppStrings.welcomeTo,

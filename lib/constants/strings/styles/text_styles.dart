@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 
 class AppTextStyles {
   static const title = TextStyle(
-    fontSize: 28,
-    fontWeight: FontWeight.w800,
+    fontSize: 34,
+    fontWeight: FontWeight.w700,
+    overflow: TextOverflow.visible,
   );
   static const subTitle = TextStyle(
     fontSize: 18,
@@ -11,7 +12,7 @@ class AppTextStyles {
   );
   static const btnWht = TextStyle(
     fontSize: 16,
-    fontWeight: FontWeight.w500,
-    color: Colors.white,
+    fontWeight: FontWeight.w600,
+    color: Color(0xFFFFFFFF),
   );
 }
