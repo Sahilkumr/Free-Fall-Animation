@@ -8,12 +8,10 @@ class FlameAnimation extends Forge2DGame {
   final double scWidth;
   final double scHeight;
 
-  late BackGround bgColor;
-
   FlameAnimation({
     required this.scWidth,
     required this.scHeight,
-  }) : super(gravity: Vector2(0, 1000));
+  }) : super(gravity: Vector2(0, 700));
 
   @override
   Color backgroundColor() {
@@ -23,42 +21,64 @@ class FlameAnimation extends Forge2DGame {
   @override
   a.FutureOr<void> onLoad() async {
     await super.onLoad();
-
-    // bgColor = BackGround()..size = Vector2.zero();
-    // add(bgColor);
-
     List<Container> containers = [
       Container(
-        conPosition: Vector2(160, 3),
-        image: 'intro_tag_4.png',
-        iWidth: 150,
-        cRadii: 20,
-      ),
-      Container(
-        conPosition: Vector2(300, 3),
-        image: 'intro_tag_5.png',
-        iWidth: 140,
-        cRadii: 20,
-      ),
-      Container(
-        conPosition: Vector2(50, 50),
+        conPosition: Vector2(50, 10),
         image: 'intro_tag_1.png',
         iWidth: 100,
-        cRadii: 26,
+        vertices: [
+          Vector2(-50, -25), // top left
+          Vector2(50, -25), // top right
+          Vector2(50, 25), // Bottom right
+          Vector2(-50, 25), // Bottom left
+        ],
       ),
       Container(
-        conPosition: Vector2(310, 100),
+        conPosition: Vector2(170, 10),
         image: 'intro_tag_2.png',
-        iWidth: 120,
-        cRadii: 26,
+        iWidth: 140,
+        vertices: [
+          Vector2(-60, -25), // top left
+          Vector2(-60, 25), // Bottom left
+          Vector2(65, -25), // top right
+          Vector2(65, 25), // Bottom right
+        ],
       ),
       Container(
-        conPosition: Vector2(50, 100),
+        conPosition: Vector2(50, 10),
         image: 'intro_tag_3.png',
-        iWidth: 100,
-        cRadii: 26,
+        iWidth: 110,
+        vertices: [
+          Vector2(-55, -25), // top left
+          Vector2(55, -18), // top right
+          Vector2(55, 25), // Bottom right
+          Vector2(-55, 25), // Bottom left
+        ],
+      ),
+      Container(
+        conPosition: Vector2(150, 10),
+        image: 'intro_tag_2.png',
+        iWidth: 140,
+        vertices: [
+          Vector2(-60, -25), // top left
+          Vector2(65, -25), // top right
+          Vector2(65, 20), // Bottom right
+          Vector2(-60, 25), // Bottom left
+        ],
+      ),
+      Container(
+        conPosition: Vector2(230, 10),
+        image: 'intro_tag_2.png',
+        iWidth: 140,
+        vertices: [
+          Vector2(-60, -25), // top left
+          Vector2(-60, 25), // Bottom left
+          Vector2(70, -25), // top right
+          Vector2(70, 25), // Bottom right
+        ],
       ),
     ];
+
     int currentContainerIndex = 0;
 
     Vector2 gameSize = Vector2(scWidth, scHeight);
@@ -70,32 +90,14 @@ class FlameAnimation extends Forge2DGame {
     add(RightWall(gameSize));
 
     a.Timer.periodic(
-      const Duration(seconds: 4),
+      const Duration(seconds: 1),
       (timer) {
-        if (currentContainerIndex < containers.length) {
-          if (containers[currentContainerIndex]
-              .image
-              .contains('intro_tag_4.png')) {
-            containers[currentContainerIndex] = Container(
-              conPosition: Vector2(70, 130),
-              image: 'intro_tag_4.png',
-              iWidth: 140,
-              cRadii: 26,
-            );
-          } else if (containers[currentContainerIndex]
-              .image
-              .contains('intro_tag_5.png')) {
-            containers[currentContainerIndex] = Container(
-              conPosition: Vector2(190, 130),
-              image: 'intro_tag_5.png',
-              iWidth: 140,
-              cRadii: 26,
-            );
-          }
-          add(containers[currentContainerIndex]);
-          print('image name: ${containers[currentContainerIndex].image}');
-          currentContainerIndex++;
-        } else {
+        print('currentIndex: $currentContainerIndex');
+
+        add(containers[currentContainerIndex]);
+        // print('image name: ${containers[currentContainerIndex].image}');
+        currentContainerIndex++;
+        if (currentContainerIndex > 4) {
           timer.cancel();
         }
       },
@@ -103,49 +105,51 @@ class FlameAnimation extends Forge2DGame {
   }
 }
 
-// class Container extends BodyComponent {
-//   final Vector2 conPosition;
-//   final String image;
-//   final double iWidth;
-//   final double cRadii;
+class Container extends BodyComponent {
+  final Vector2 conPosition;
+  final String image;
+  final double iWidth;
+  final List<Vector2> vertices; // Vertices of the polygon
 
-//   Container({
-//     required this.conPosition,
-//     required this.image,
-//     required this.iWidth,
-//     required this.cRadii,
-//   });
-//   @override
-//   Future<void> onLoad() async {
-//     await super.onLoad();
-//     renderBody = true;
+  Container({
+    required this.conPosition,
+    required this.image,
+    required this.iWidth,
+    required this.vertices,
+  });
+  @override
+  Future<void> onLoad() async {
+    await super.onLoad();
+    renderBody = false;
 
-//     add(
-//       SpriteComponent(
-//         sprite: await Sprite.load(image),
-//         size: Vector2(iWidth, 50),
-//         anchor: Anchor.center,
-//       ),
-//     );
-//   }
+    add(
+      SpriteComponent(
+        sprite: await Sprite.load(image),
+        size: Vector2(iWidth, 50),
+        anchor: Anchor.center,
+      ),
+    );
+  }
 
-//   @override
-//   Body createBody() {
-//     final shape = CircleShape()..radius = cRadii;
-//     final fixtureDef = FixtureDef(
-//       shape,
-//       friction: 1,
-//       density: 1,
-//       restitution: 0,
-//     );
-//     final bodyDef = BodyDef(
-//       position: conPosition,
-//       type: BodyType.dynamic,
-//     );
+  @override
+  Body createBody() {
+    final shape = PolygonShape()..set(vertices);
+    final fixtureDef = FixtureDef(
+      shape,
+      friction: 1,
+      density: 0.1,
+      restitution: 0,
+    );
+    final bodyDef = BodyDef(
+      position: conPosition,
+      type: BodyType.dynamic,
+      bullet: true,
+      // gravityScale: Vector2(0, 100),
+    );
 
-//     return world.createBody(bodyDef)..createFixture(fixtureDef);
-//   }
-// }
+    return world.createBody(bodyDef)..createFixture(fixtureDef);
+  }
+}
 
 class Ground extends BodyComponent {
   final Vector2 gameSize;
@@ -155,18 +159,26 @@ class Ground extends BodyComponent {
   Body createBody() {
     final shape = EdgeShape()
       ..set(
-        Vector2(-5, gameSize.y - 5),
-        Vector2(gameSize.x - 5, gameSize.y - 5),
+        Vector2(0, gameSize.y),
+        Vector2(gameSize.x, gameSize.y),
       );
     final fixtureDef = FixtureDef(
       shape,
-      friction: 0.1,
+      friction: 1,
     );
     final bodyDef = BodyDef(
       userData: this,
-      position: Vector2.zero(),
+      position: Vector2(0, 0),
     );
+
     return world.createBody(bodyDef)..createFixture(fixtureDef);
+  }
+
+  @override
+  void renderEdge(Canvas canvas, Offset p1, Offset p2) {
+    final paint = Paint()..color = const Color(0xFFFCE469);
+    canvas.drawLine(
+        Offset(0, gameSize.y), Offset(gameSize.x, gameSize.y), paint);
   }
 }
 
@@ -179,17 +191,23 @@ class LeftWall extends BodyComponent {
     final shape = EdgeShape()
       ..set(
         Vector2(0, 0),
-        Vector2(-1, gameSize.y),
+        Vector2(0, gameSize.y),
       );
     final fixtureDef = FixtureDef(
       shape,
-      friction: 0.1,
+      friction: 1,
     );
     final bodyDef = BodyDef(
       userData: this,
       position: Vector2.zero(),
     );
     return world.createBody(bodyDef)..createFixture(fixtureDef);
+  }
+
+  @override
+  void renderEdge(Canvas canvas, Offset p1, Offset p2) {
+    final paint = Paint()..color = const Color(0xFFFCE469);
+    canvas.drawLine(const Offset(0, 0), Offset(-1, gameSize.y), paint);
   }
 }
 
@@ -206,7 +224,7 @@ class RightWall extends BodyComponent {
       );
     final fixtureDef = FixtureDef(
       shape,
-      friction: 0.1,
+      friction: 1,
     );
     final bodyDef = BodyDef(
       userData: this,
@@ -214,64 +232,11 @@ class RightWall extends BodyComponent {
     );
     return world.createBody(bodyDef)..createFixture(fixtureDef);
   }
-}
-
-class BackGround extends PositionComponent {
-  @override
-  void render(Canvas canvas) {
-    // super.render(canvas);
-    canvas.drawColor(Colors.yellow, BlendMode.src);
-  }
-}
-
-
-class PolygonContainer extends BodyComponent {
-  final Vector2 conPosition;
-  final String image;
-  final double iWidth;
-  final double iHeight; // New property for the height of the polygon
-  final List<Vector2> vertices; // Vertices of the polygon
-
-  PolygonContainer({
-    required this.conPosition,
-    required this.image,
-    required this.iWidth,
-    required this.iHeight,
-  }) : vertices = [
-         Vector2(0, 0),
-         Vector2(iWidth, 0),
-         Vector2(iWidth, iHeight), // Bottom right
-         Vector2(0, iHeight),      // Bottom left
-       ];
 
   @override
-  Future<void> onLoad() async {
-    await super.onLoad();
-    renderBody = true;
-
-    add(
-      SpriteComponent(
-        sprite: await Sprite.load(image),
-        size: Vector2(iWidth, iHeight), // Update size to match polygon
-        anchor: Anchor.center,
-      ),
-    );
-  }
-
-  @override
-  Body createBody() {
-    final shape = PolygonShape()..set(vertices);
-    final fixtureDef = FixtureDef(
-      shape,
-      friction: 1,
-      density: 1,
-      restitution: 0,
-    );
-    final bodyDef = BodyDef(
-      position: conPosition,
-      type: BodyType.dynamic,
-    );
-
-    return world.createBody(bodyDef)..createFixture(fixtureDef);
+  void renderEdge(Canvas canvas, Offset p1, Offset p2) {
+    final paint = Paint()..color = const Color(0xFFFCE469);
+    canvas.drawLine(
+        Offset(gameSize.x, 0), Offset(gameSize.x, gameSize.y), paint);
   }
 }
