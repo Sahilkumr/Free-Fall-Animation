@@ -24,8 +24,7 @@ class WelcomeScreen extends StatefulWidget {
   State<WelcomeScreen> createState() => _WelcomeScreenState();
 }
 
-class _WelcomeScreenState extends State<WelcomeScreen>
-    with WidgetsBindingObserver {
+class _WelcomeScreenState extends State<WelcomeScreen> {
   late AnimEndTextCubit animEndCubit;
 
   GlobalKey expKey = GlobalKey();
@@ -38,11 +37,6 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   void initState() {
     super.initState();
     animEndCubit = AnimEndTextCubit();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      RenderBox rb = expKey.currentContext!.findRenderObject() as RenderBox;
-      eHeight.value = rb.size.height;
-      print('Expaned height : ${rb.size.height}');
-    });
   }
 
   @override
@@ -53,13 +47,6 @@ class _WelcomeScreenState extends State<WelcomeScreen>
 
   @override
   Widget build(BuildContext context) {
-    print('eHeight valueable: ${eHeight.value}');
-    print('exHeigh in build: $expHeight');
-    // scWidth = MediaQuery.of(context).size.width;
-    // scHeight = MediaQuery.of(context).size.height;
-
-    // print('scwidth: $scWidth');
-    print('scHeight: ${widget.scHeight}');
     return Scaffold(
       backgroundColor: const Color(0xFFFCE469),
       body: Padding(
@@ -72,11 +59,18 @@ class _WelcomeScreenState extends State<WelcomeScreen>
               children: [
                 const WelcomeTopTextsWidget(),
                 Expanded(
-                  child: flame.GameWidget(
-                    game: flame_anim.FlameAnimation(
-                      scWidth: widget.scWidth * 0.9,
-                      scHeight: widget.scHeight * 0.45,
-                      animCubit: animEndCubit,
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 20),
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        return flame.GameWidget(
+                          game: flame_anim.FlameAnimation(
+                            scWidth: constraints.maxWidth,
+                            scHeight: constraints.maxHeight,
+                            animCubit: animEndCubit,
+                          ),
+                        );
+                      },
                     ),
                   ),
                 ),
