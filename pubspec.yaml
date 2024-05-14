@@ -37,7 +37,9 @@ dependencies:
   cupertino_icons: ^1.0.6
   easy_physics_2d: ^0.0.1
   flame_forge2d: ^0.18.0
-  bloc: ^8.1.4
+  flame: ^1.17.0
+  flutter_bloc: ^8.1.5
+  meta: ^1.11.0
 
 dev_dependencies:
   flutter_test:
