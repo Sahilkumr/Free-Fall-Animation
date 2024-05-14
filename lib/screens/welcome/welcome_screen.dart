@@ -1,11 +1,9 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flame/game.dart' as flame;
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:helm_demo/constants/strings/app_strings.dart';
 import 'package:helm_demo/constants/strings/styles/text_styles.dart';
-import 'package:helm_demo/screens/welcome/cubit/anim_end_text_cubit.dart';
+import 'package:helm_demo/screens/welcome/cubit/mid_tag_line_cubit.dart';
 import 'package:helm_demo/screens/welcome/widgets/flame_animation.dart'
     as flame_anim;
 import 'package:helm_demo/screens/welcome/widgets/welcome_btn_widget.dart';
@@ -26,12 +24,6 @@ class WelcomeScreen extends StatefulWidget {
 
 class _WelcomeScreenState extends State<WelcomeScreen> {
   late AnimEndTextCubit animEndCubit;
-
-  GlobalKey expKey = GlobalKey();
-
-  double expHeight = 0;
-
-  ValueNotifier<double> eHeight = ValueNotifier(0);
 
   @override
   void initState() {
@@ -89,16 +81,14 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 child: BlocBuilder(
                   bloc: animEndCubit,
                   builder: (context, state) {
-                    if (state is AnimEndTextDisplay) {
+                    if (state is MidTagLineDisplay) {
                       return SizedBox(
-                        width: widget.scWidth * 0.90,
-                        child: Center(
-                          child: Text(
-                            AppStrings.middleTagLine,
-                            style: AppTextStyles.titleOp50,
-                            maxLines: 2,
-                            textAlign: TextAlign.left,
-                          ),
+                        width: widget.scWidth,
+                        child: Text(
+                          AppStrings.middleTagLine,
+                          style: AppTextStyles.titleOp50,
+                          maxLines: 2,
+                          textAlign: TextAlign.left,
                         ),
                       );
                     }
