@@ -23,12 +23,12 @@ class WelcomeScreen extends StatefulWidget {
 }
 
 class _WelcomeScreenState extends State<WelcomeScreen> {
-  late AnimEndTextCubit animEndCubit;
+  late MidTagLineCubit animEndCubit;
 
   @override
   void initState() {
     super.initState();
-    animEndCubit = AnimEndTextCubit();
+    animEndCubit = MidTagLineCubit();
   }
 
   @override
