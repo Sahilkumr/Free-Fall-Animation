@@ -3,14 +3,17 @@ import 'dart:ui';
 import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
+import 'package:helm_demo/screens/welcome/cubit/mid_tag_line_cubit.dart';
 
 class FlameAnimation extends Forge2DGame {
   final double scWidth;
   final double scHeight;
+  final MidTagLineCubit animCubit;
 
   FlameAnimation({
     required this.scWidth,
     required this.scHeight,
+    required this.animCubit,
   }) : super(gravity: Vector2(0, 700));
 
   @override
@@ -82,9 +85,10 @@ class FlameAnimation extends Forge2DGame {
     int currentContainerIndex = 0;
 
     Vector2 gameSize = Vector2(scWidth, scHeight);
+    print('scHeight: $scHeight');
     // print('GameSize Value : ${camera.viewport.size}');
-    // print('gmaesize y : ${gameSize.y}');
-    // print('gmaesize x : ${gameSize.x}');
+    print('gmaesize y : ${gameSize.y}');
+    print('gmaesize x : ${gameSize.x}');
     add(Ground(gameSize));
     add(LeftWall(gameSize));
     add(RightWall(gameSize));
@@ -99,6 +103,8 @@ class FlameAnimation extends Forge2DGame {
         currentContainerIndex++;
         if (currentContainerIndex > 4) {
           timer.cancel();
+          animCubit.animationEnded();
+          print('con Position : ${containers[4].conPosition.y == scHeight}');
         }
       },
     );
@@ -144,7 +150,6 @@ class Container extends BodyComponent {
       position: conPosition,
       type: BodyType.dynamic,
       bullet: true,
-      // gravityScale: Vector2(0, 100),
     );
 
     return world.createBody(bodyDef)..createFixture(fixtureDef);
@@ -191,7 +196,7 @@ class LeftWall extends BodyComponent {
     final shape = EdgeShape()
       ..set(
         Vector2(0, 0),
-        Vector2(0, gameSize.y),
+        Vector2(-1, gameSize.y),
       );
     final fixtureDef = FixtureDef(
       shape,
