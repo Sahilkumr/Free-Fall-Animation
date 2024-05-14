@@ -1,11 +1,6 @@
-import 'dart:async';
-import 'dart:ui';
-
-import 'package:easy_physics_2d/gravity_field.dart';
-import 'package:easy_physics_2d/objects.dart';
 import 'package:flutter/material.dart';
-import 'package:helm_demo/screens/welcome/widgets/custom_gravityfield.dart';
-import 'package:helm_demo/screens/welcome/widgets/custom_physicsobj.dart';
+import 'package:helm_demo/screens/welcome/widgets/extras/custom_gravityfield.dart';
+import 'package:helm_demo/screens/welcome/widgets/extras/custom_physicsobj.dart';
 
 class ChipAnimationWidget extends StatefulWidget {
   const ChipAnimationWidget({super.key});

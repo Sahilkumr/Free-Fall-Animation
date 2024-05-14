@@ -15,4 +15,11 @@ class AppTextStyles {
     fontWeight: FontWeight.w600,
     color: Color(0xFFFFFFFF),
   );
+
+  static var titleOp50 = const TextStyle(
+    fontSize: 44,
+    fontWeight: FontWeight.w600,
+    color: Color(0x1a1a1a1a),
+    overflow: TextOverflow.visible
+  );
 }

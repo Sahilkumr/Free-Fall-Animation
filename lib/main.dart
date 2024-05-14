@@ -17,7 +17,10 @@ class MyApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      home: const WelcomeScreen(),
+      home: WelcomeScreen(
+        scHeight: MediaQuery.of(context).size.height,
+        scWidth: MediaQuery.of(context).size.width,
+      ),
     );
   }
 }

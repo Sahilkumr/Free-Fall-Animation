@@ -1,6 +1,5 @@
-import 'dart:async';
 import 'dart:math';
-import 'package:helm_demo/screens/welcome/widgets/custom_physicsobj.dart';
+import 'package:helm_demo/screens/welcome/widgets/extras/custom_physicsobj.dart';
 import 'package:flutter/material.dart';
 
 class CustomGravityField extends StatefulWidget {
