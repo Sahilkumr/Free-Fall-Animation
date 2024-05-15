@@ -41,63 +41,67 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFFCE469),
-      body: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 80, 20, 20),
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const WelcomeTopTextsWidget(),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 20),
-                    child: LayoutBuilder(
-                      builder: (context, constraints) {
-                        return flame.GameWidget(
-                          game: flame_anim.FlameAnimation(
-                            scWidth: constraints.maxWidth,
-                            scHeight: constraints.maxHeight,
-                            animCubit: animEndCubit,
-                          ),
-                        );
-                      },
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 80, 20, 20),
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const WelcomeTopTextsWidget(),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 20),
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          return flame.GameWidget(
+                            game: flame_anim.FlameAnimation(
+                              scWidth: constraints.maxWidth,
+                              scHeight: constraints.maxHeight,
+                              animCubit: animEndCubit,
+                              chipDropPoint:
+                                  widget.scHeight - constraints.maxHeight,
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   ),
-                ),
-                const Row(
-                  children: [
-                    Expanded(
-                      child: WelcomeButtonWidget(),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            Positioned(
-              child: BlocProvider.value(
-                value: animEndCubit,
-                child: BlocBuilder(
-                  bloc: animEndCubit,
-                  builder: (context, state) {
-                    if (state is MidTagLineDisplay) {
-                      return SizedBox(
-                        width: widget.scWidth,
-                        child: Text(
-                          AppStrings.middleTagLine,
-                          style: AppTextStyles.titleOp50,
-                          maxLines: 2,
-                          textAlign: TextAlign.left,
-                        ),
-                      );
-                    }
-                    return Container();
-                  },
+                  const Row(
+                    children: [
+                      Expanded(
+                        child: WelcomeButtonWidget(),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              Positioned(
+                child: BlocProvider.value(
+                  value: animEndCubit,
+                  child: BlocBuilder(
+                    bloc: animEndCubit,
+                    builder: (context, state) {
+                      if (state is MidTagLineDisplay) {
+                        return SizedBox(
+                          width: widget.scWidth,
+                          child: Text(
+                            AppStrings.middleTagLine,
+                            style: AppTextStyles.titleOp50,
+                            maxLines: 2,
+                            textAlign: TextAlign.left,
+                          ),
+                        );
+                      }
+                      return Container();
+                    },
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

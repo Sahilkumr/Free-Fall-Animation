@@ -8,7 +8,6 @@ class WelcomeButtonWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 50,
-      width: 400,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(30),
         color: Colors.black,
