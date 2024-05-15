@@ -8,13 +8,15 @@ import 'package:helm_demo/screens/welcome/cubit/mid_tag_line_cubit.dart';
 class FlameAnimation extends Forge2DGame {
   final double scWidth;
   final double scHeight;
+  final double chipDropPoint;
   final MidTagLineCubit animCubit;
 
   FlameAnimation({
     required this.scWidth,
     required this.scHeight,
+    required this.chipDropPoint,
     required this.animCubit,
-  }) : super(gravity: Vector2(0, 700));
+  }) : super(gravity: Vector2(0,2000));
 
   @override
   Color backgroundColor() {
@@ -23,10 +25,11 @@ class FlameAnimation extends Forge2DGame {
 
   @override
   a.FutureOr<void> onLoad() async {
+    print('drop point height : $chipDropPoint');
     await super.onLoad();
     List<Container> containers = [
       Container(
-        conPosition: Vector2(50, 10),
+        conPosition: Vector2(50, -chipDropPoint),
         image: 'intro_tag_1.png',
         iWidth: 100,
         vertices: [
@@ -37,7 +40,7 @@ class FlameAnimation extends Forge2DGame {
         ],
       ),
       Container(
-        conPosition: Vector2(170, 10),
+        conPosition: Vector2(170, -chipDropPoint),
         image: 'intro_tag_2.png',
         iWidth: 140,
         vertices: [
@@ -48,7 +51,7 @@ class FlameAnimation extends Forge2DGame {
         ],
       ),
       Container(
-        conPosition: Vector2(50, 10),
+        conPosition: Vector2(57, -chipDropPoint),
         image: 'intro_tag_3.png',
         iWidth: 110,
         vertices: [
@@ -59,7 +62,7 @@ class FlameAnimation extends Forge2DGame {
         ],
       ),
       Container(
-        conPosition: Vector2(150, 10),
+        conPosition: Vector2(150, -chipDropPoint),
         image: 'intro_tag_2.png',
         iWidth: 140,
         vertices: [
@@ -70,7 +73,7 @@ class FlameAnimation extends Forge2DGame {
         ],
       ),
       Container(
-        conPosition: Vector2(230, 10),
+        conPosition: Vector2(230, -chipDropPoint),
         image: 'intro_tag_2.png',
         iWidth: 140,
         vertices: [
@@ -85,22 +88,19 @@ class FlameAnimation extends Forge2DGame {
     int currentContainerIndex = 0;
 
     Vector2 gameSize = Vector2(scWidth, scHeight);
-    print('scHeight: $scHeight');
-    // print('GameSize Value : ${camera.viewport.size}');
-    print('gmaesize y : ${gameSize.y}');
-    print('gmaesize x : ${gameSize.x}');
+
     add(Ground(gameSize));
     add(LeftWall(gameSize));
     add(RightWall(gameSize));
 
     a.Timer.periodic(
-      const Duration(seconds: 1),
+      const Duration(milliseconds: 1000),
       (timer) {
         print('currentIndex: $currentContainerIndex');
 
         add(containers[currentContainerIndex]);
-        // print('image name: ${containers[currentContainerIndex].image}');
         currentContainerIndex++;
+
         if (currentContainerIndex > 4) {
           timer.cancel();
           animCubit.animationEnded();
@@ -115,7 +115,7 @@ class Container extends BodyComponent {
   final Vector2 conPosition;
   final String image;
   final double iWidth;
-  final List<Vector2> vertices; // Vertices of the polygon
+  final List<Vector2> vertices;
 
   Container({
     required this.conPosition,
@@ -149,10 +149,17 @@ class Container extends BodyComponent {
     final bodyDef = BodyDef(
       position: conPosition,
       type: BodyType.dynamic,
-      bullet: true,
+      bullet: false,
+      linearVelocity: Vector2(0, 1000) * 5,
     );
 
-    return world.createBody(bodyDef)..createFixture(fixtureDef);
+    var body = world.createBody(bodyDef)
+      ..createFixture(fixtureDef)
+      ..applyForce(
+        Vector2(0, 500),
+      );
+
+    return body;
   }
 }
 
