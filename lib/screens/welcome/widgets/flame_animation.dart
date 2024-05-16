@@ -1,7 +1,7 @@
 import 'dart:async' as a;
-import 'dart:ui';
 import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flame/components.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:helm_demo/screens/welcome/cubit/mid_tag_line_cubit.dart';
 
@@ -16,7 +16,7 @@ class FlameAnimation extends Forge2DGame {
     required this.scHeight,
     required this.chipDropPoint,
     required this.animCubit,
-  }) : super(gravity: Vector2(0,2000));
+  }) : super(gravity: Vector2(0, 3000));
 
   @override
   Color backgroundColor() {
@@ -24,10 +24,30 @@ class FlameAnimation extends Forge2DGame {
   }
 
   @override
+  void update(double dt) async {
+    super.update(dt);
+    // await Future.delayed(
+    //   const Duration(seconds: 0),
+    //   () {
+    if (containers[containers.length - 1].body.position.y +
+            containers[4].iWidth / 2 >
+        scHeight - 1) {
+      animCubit.animationEnded();
+    }
+  }
+
+  // );
+
+  late List<Container> containers;
+
+  @override
   a.FutureOr<void> onLoad() async {
-    print('drop point height : $chipDropPoint');
+    if (kDebugMode) {
+      print('drop point height : $chipDropPoint');
+    }
     await super.onLoad();
-    List<Container> containers = [
+
+    containers = [
       Container(
         conPosition: Vector2(50, -chipDropPoint),
         image: 'intro_tag_1.png',
@@ -93,21 +113,29 @@ class FlameAnimation extends Forge2DGame {
     add(LeftWall(gameSize));
     add(RightWall(gameSize));
 
-    a.Timer.periodic(
-      const Duration(milliseconds: 1000),
-      (timer) {
-        print('currentIndex: $currentContainerIndex');
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      a.Timer.periodic(
+        const Duration(milliseconds: 1000),
+        (timer) {
+          if (kDebugMode) {
+            print('currentIndex: $currentContainerIndex');
+          }
 
-        add(containers[currentContainerIndex]);
-        currentContainerIndex++;
+          add(containers[currentContainerIndex]);
+          currentContainerIndex++;
 
-        if (currentContainerIndex > 4) {
-          timer.cancel();
-          animCubit.animationEnded();
-          print('con Position : ${containers[4].conPosition.y == scHeight}');
-        }
-      },
-    );
+          if (currentContainerIndex > 4) {
+            timer.cancel();
+            // Future.delayed(
+            //   const Duration(seconds: 6),
+            //   () {
+            //     animCubit.animationEnded();
+            //   },
+            // );
+          }
+        },
+      );
+    });
   }
 }
 
@@ -158,7 +186,6 @@ class Container extends BodyComponent {
       ..applyForce(
         Vector2(0, 500),
       );
-
     return body;
   }
 }
