@@ -1,4 +1,4 @@
-import 'dart:async' as a;
+import 'dart:async' as asyn;
 import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/foundation.dart';
@@ -30,7 +30,7 @@ class FlameAnimation extends Forge2DGame {
   ValueNotifier<bool> isBuild = ValueNotifier(false);
 
   @override
-  a.FutureOr<void> onLoad() async {
+  asyn.FutureOr<void> onLoad() async {
     await super.onLoad();
 
     containers = [
@@ -45,7 +45,6 @@ class FlameAnimation extends Forge2DGame {
           Vector2(-50, 26), // Bottom left
         ],
         scHeight: scHeight,
-        isBuild: isBuild,
       ),
       Container(
         conPosition: Vector2(170, -chipDropPoint),
@@ -58,7 +57,6 @@ class FlameAnimation extends Forge2DGame {
           Vector2(66, 25), // Bottom right
         ],
         scHeight: scHeight,
-        isBuild: isBuild,
       ),
       Container(
         conPosition: Vector2(50, -chipDropPoint),
@@ -71,7 +69,6 @@ class FlameAnimation extends Forge2DGame {
           Vector2(-56, 25), // Bottom left
         ],
         scHeight: scHeight,
-        isBuild: isBuild,
       ),
       Container(
         conPosition: Vector2(180, -chipDropPoint),
@@ -84,7 +81,6 @@ class FlameAnimation extends Forge2DGame {
           Vector2(-68, 26), // Bottom left
         ],
         scHeight: scHeight,
-        isBuild: isBuild,
       ),
       Container(
         conPosition: Vector2(240, -chipDropPoint),
@@ -97,7 +93,6 @@ class FlameAnimation extends Forge2DGame {
           Vector2(70, 25), // Bottom right
         ],
         scHeight: scHeight,
-        isBuild: isBuild,
       ),
     ];
 
@@ -109,15 +104,14 @@ class FlameAnimation extends Forge2DGame {
     add(LeftWall(gameSize));
     add(RightWall(gameSize));
 
-    a.Timer.periodic(
+    asyn.Timer.periodic(
       const Duration(milliseconds: 1000),
       (timer) async {
         if (kDebugMode) {
           print(
-            'currentIndex: $currentContainerIndex \nCurrentImage: ${containers[currentContainerIndex].image.toString()}',
+            'currentIndex: $currentContainerIndex --> CurrentImage: ${containers[currentContainerIndex].image.toString()}',
           );
         }
-
         await add(containers[currentContainerIndex]);
         currentContainerIndex++;
 
@@ -132,24 +126,20 @@ class FlameAnimation extends Forge2DGame {
   void update(double dt) async {
     super.update(dt);
     try {
-      if (isBuild.value) {
-        for (var e in containers) {
-          try {
-            if (e._isBodyInitialized &&
-                e.body.position.y > scHeight! * 0.70 &&
-                e.isBuild!.value) {
-              updateBody(e);
-              continue;
-            }
-          } catch (ex) {
-            log.i('Exception occurred for ${e.image}: $ex');
+      for (var e in containers) {
+        try {
+          if (e._isBodyInitialized && e.body.position.y > scHeight * 0.70) {
+            _updateBody(e);
+            continue;
           }
+        } catch (ex) {
+          log.i('Exception occurred for ${e.image}: $ex');
         }
 
         if (containers.isNotEmpty &&
             containers.last._isBodyInitialized &&
             containers.last.body.position.y + containers.last.iWidth / 2 >
-                (scHeight! * 0.70)) {
+                (scHeight * 0.70)) {
           animCubit.animationEnded();
         }
       }
@@ -158,7 +148,7 @@ class FlameAnimation extends Forge2DGame {
     }
   }
 
-  void updateBody(Container con) {
+  void _updateBody(Container con) {
     con.body.setType(BodyType.dynamic);
     con.body.gravityOverride = Vector2(0, 1500);
     con.body.fixtures.first.friction = 1;
@@ -172,7 +162,6 @@ class Container extends BodyComponent {
   final double iWidth;
   final List<Vector2> vertices;
   final double? scHeight;
-  final ValueNotifier? isBuild;
 
   Container({
     required this.conPosition,
@@ -180,7 +169,6 @@ class Container extends BodyComponent {
     required this.iWidth,
     required this.vertices,
     this.scHeight,
-    this.isBuild,
   });
 
   double cusGravity = 5;
@@ -216,7 +204,6 @@ class Container extends BodyComponent {
       type: BodyType.static,
     );
     var body = world.createBody(bodyDef)..createFixture(fixtureDef);
-    isBuild?.value = true;
 
     return body;
   }
@@ -230,10 +217,13 @@ class Container extends BodyComponent {
     body.position.y += velocity.y * dt;
 
     if (body.position.y > (scHeight! * 0.70)) {
-      Future.delayed(const Duration(microseconds: 200), () {
-        velocity.y = 0;
-        cusGravity = 0;
-      });
+      Future.delayed(
+        const Duration(microseconds: 200),
+        () {
+          velocity.y = 0;
+          cusGravity = 0;
+        },
+      );
     }
   }
 }
