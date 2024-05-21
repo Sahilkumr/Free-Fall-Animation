@@ -4,6 +4,9 @@ import 'package:flame/components.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:helm_demo/screens/welcome/cubit/mid_tag_line_cubit.dart';
+import 'package:logger/logger.dart';
+
+Logger log = Logger();
 
 class FlameAnimation extends Forge2DGame {
   final double scWidth;
@@ -16,35 +19,18 @@ class FlameAnimation extends Forge2DGame {
     required this.scHeight,
     required this.chipDropPoint,
     required this.animCubit,
-  }) : super(gravity: Vector2(0, 3000));
+  }) : super();
 
   @override
   Color backgroundColor() {
     return const Color(0xFFFCE469);
   }
 
-  @override
-  void update(double dt) async {
-    super.update(dt);
-    // await Future.delayed(
-    //   const Duration(seconds: 0),
-    //   () {
-    if (containers[containers.length - 1].body.position.y +
-            containers[4].iWidth / 2 >
-        scHeight - 1) {
-      animCubit.animationEnded();
-    }
-  }
-
-  // );
-
   late List<Container> containers;
+  ValueNotifier<bool> isBuild = ValueNotifier(false);
 
   @override
   a.FutureOr<void> onLoad() async {
-    if (kDebugMode) {
-      print('drop point height : $chipDropPoint');
-    }
     await super.onLoad();
 
     containers = [
@@ -53,47 +39,55 @@ class FlameAnimation extends Forge2DGame {
         image: 'intro_tag_1.png',
         iWidth: 100,
         vertices: [
-          Vector2(-50, -25), // top left
-          Vector2(50, -25), // top right
-          Vector2(50, 25), // Bottom right
-          Vector2(-50, 25), // Bottom left
+          Vector2(-50, -26), // top left
+          Vector2(50, -26), // top right
+          Vector2(50, 26), // Bottom right
+          Vector2(-50, 26), // Bottom left
         ],
+        scHeight: scHeight,
+        isBuild: isBuild,
       ),
       Container(
         conPosition: Vector2(170, -chipDropPoint),
         image: 'intro_tag_2.png',
         iWidth: 140,
         vertices: [
-          Vector2(-60, -25), // top left
-          Vector2(-60, 25), // Bottom left
-          Vector2(65, -25), // top right
-          Vector2(65, 25), // Bottom right
+          Vector2(-66, -25), // top left
+          Vector2(-66, 25), // Bottom left
+          Vector2(66, -25), // top right
+          Vector2(66, 25), // Bottom right
         ],
+        scHeight: scHeight,
+        isBuild: isBuild,
       ),
       Container(
-        conPosition: Vector2(57, -chipDropPoint),
+        conPosition: Vector2(50, -chipDropPoint),
         image: 'intro_tag_3.png',
         iWidth: 110,
         vertices: [
-          Vector2(-55, -25), // top left
-          Vector2(55, -18), // top right
-          Vector2(55, 25), // Bottom right
-          Vector2(-55, 25), // Bottom left
+          Vector2(-56, -25), // top left
+          Vector2(56, -25), // top right
+          Vector2(56, 25), // Bottom right
+          Vector2(-56, 25), // Bottom left
         ],
+        scHeight: scHeight,
+        isBuild: isBuild,
       ),
       Container(
-        conPosition: Vector2(150, -chipDropPoint),
+        conPosition: Vector2(180, -chipDropPoint),
         image: 'intro_tag_2.png',
         iWidth: 140,
         vertices: [
-          Vector2(-60, -25), // top left
-          Vector2(65, -25), // top right
-          Vector2(65, 20), // Bottom right
-          Vector2(-60, 25), // Bottom left
+          Vector2(-68, -26), // top left
+          Vector2(65, -24), // top right
+          Vector2(65, 26), // Bottom right
+          Vector2(-68, 26), // Bottom left
         ],
+        scHeight: scHeight,
+        isBuild: isBuild,
       ),
       Container(
-        conPosition: Vector2(230, -chipDropPoint),
+        conPosition: Vector2(240, -chipDropPoint),
         image: 'intro_tag_2.png',
         iWidth: 140,
         vertices: [
@@ -102,6 +96,8 @@ class FlameAnimation extends Forge2DGame {
           Vector2(70, -25), // top right
           Vector2(70, 25), // Bottom right
         ],
+        scHeight: scHeight,
+        isBuild: isBuild,
       ),
     ];
 
@@ -113,29 +109,55 @@ class FlameAnimation extends Forge2DGame {
     add(LeftWall(gameSize));
     add(RightWall(gameSize));
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      a.Timer.periodic(
-        const Duration(milliseconds: 1000),
-        (timer) {
-          if (kDebugMode) {
-            print('currentIndex: $currentContainerIndex');
-          }
+    a.Timer.periodic(
+      const Duration(milliseconds: 1000),
+      (timer) async {
+        if (kDebugMode) {
+          print('currentIndex: $currentContainerIndex');
+        }
 
-          add(containers[currentContainerIndex]);
-          currentContainerIndex++;
+        await add(containers[currentContainerIndex]);
+        currentContainerIndex++;
 
-          if (currentContainerIndex > 4) {
-            timer.cancel();
-            // Future.delayed(
-            //   const Duration(seconds: 6),
-            //   () {
-            //     animCubit.animationEnded();
-            //   },
-            // );
+        if (currentContainerIndex > 4) {
+          timer.cancel();
+        }
+      },
+    );
+  }
+
+  @override
+  void update(double dt) async {
+    super.update(dt);
+    try {
+      if (isBuild.value) {
+        for (var e in containers) {
+          try {
+            if (e.body.position.y > scHeight * 0.70 && e.isBuild!.value) {
+              updateBody(e);
+              continue;
+            }
+          } catch (ex) {
+            log.i('Exception occurred for ${e.image}: $ex');
           }
-        },
-      );
-    });
+        }
+
+        if (containers[containers.length - 1].body.position.y +
+                containers[4].iWidth / 2 >
+            (scHeight * 0.70)) {
+          animCubit.animationEnded();
+        }
+      }
+    } catch (ex) {
+      log.d(' Outer Exception: $ex');
+    }
+  }
+
+  void updateBody(Container con) {
+    con.body.setType(BodyType.dynamic);
+    con.body.gravityOverride = Vector2(0, 1500);
+    con.body.fixtures.first.friction = 1;
+    con.body.fixtures.first.restitution = 0;
   }
 }
 
@@ -144,13 +166,21 @@ class Container extends BodyComponent {
   final String image;
   final double iWidth;
   final List<Vector2> vertices;
+  final double? scHeight;
+  final ValueNotifier? isBuild;
 
   Container({
     required this.conPosition,
     required this.image,
     required this.iWidth,
     required this.vertices,
+    this.scHeight,
+    this.isBuild,
   });
+
+  double cusGravity = 5;
+  Vector2 velocity = Vector2(0, 20);
+
   @override
   Future<void> onLoad() async {
     await super.onLoad();
@@ -171,22 +201,33 @@ class Container extends BodyComponent {
     final fixtureDef = FixtureDef(
       shape,
       friction: 1,
-      density: 0.1,
+      density: 1,
       restitution: 0,
     );
     final bodyDef = BodyDef(
       position: conPosition,
-      type: BodyType.dynamic,
-      bullet: false,
-      linearVelocity: Vector2(0, 1000) * 5,
+      type: BodyType.static,
     );
+    var body = world.createBody(bodyDef)..createFixture(fixtureDef);
+    isBuild?.value = true;
 
-    var body = world.createBody(bodyDef)
-      ..createFixture(fixtureDef)
-      ..applyForce(
-        Vector2(0, 500),
-      );
     return body;
+  }
+
+  @override
+  void update(double dt) {
+    super.update(dt);
+
+    velocity.y += cusGravity;
+
+    body.position.y += velocity.y * dt;
+
+    if (body.position.y > (scHeight! * 0.70)) {
+      Future.delayed(const Duration(microseconds: 200), () {
+        velocity.y = 0;
+        cusGravity = 0;
+      });
+    }
   }
 }
 
@@ -204,6 +245,7 @@ class Ground extends BodyComponent {
     final fixtureDef = FixtureDef(
       shape,
       friction: 1,
+      restitution: 0,
     );
     final bodyDef = BodyDef(
       userData: this,
