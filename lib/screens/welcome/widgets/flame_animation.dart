@@ -113,7 +113,9 @@ class FlameAnimation extends Forge2DGame {
       const Duration(milliseconds: 1000),
       (timer) async {
         if (kDebugMode) {
-          print('currentIndex: $currentContainerIndex');
+          print(
+            'currentIndex: $currentContainerIndex \nCurrentImage: ${containers[currentContainerIndex].image.toString()}',
+          );
         }
 
         await add(containers[currentContainerIndex]);
@@ -133,7 +135,9 @@ class FlameAnimation extends Forge2DGame {
       if (isBuild.value) {
         for (var e in containers) {
           try {
-            if (e.body.position.y > scHeight * 0.70 && e.isBuild!.value) {
+            if (e._isBodyInitialized &&
+                e.body.position.y > scHeight! * 0.70 &&
+                e.isBuild!.value) {
               updateBody(e);
               continue;
             }
@@ -142,9 +146,10 @@ class FlameAnimation extends Forge2DGame {
           }
         }
 
-        if (containers[containers.length - 1].body.position.y +
-                containers[4].iWidth / 2 >
-            (scHeight * 0.70)) {
+        if (containers.isNotEmpty &&
+            containers.last._isBodyInitialized &&
+            containers.last.body.position.y + containers.last.iWidth / 2 >
+                (scHeight! * 0.70)) {
           animCubit.animationEnded();
         }
       }
@@ -180,6 +185,7 @@ class Container extends BodyComponent {
 
   double cusGravity = 5;
   Vector2 velocity = Vector2(0, 20);
+  bool _isBodyInitialized = false;
 
   @override
   Future<void> onLoad() async {
@@ -193,6 +199,7 @@ class Container extends BodyComponent {
         anchor: Anchor.center,
       ),
     );
+    _isBodyInitialized = true;
   }
 
   @override
