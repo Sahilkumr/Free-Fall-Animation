@@ -1,9 +1,12 @@
 import 'dart:async' as asyn;
 import 'package:flame_forge2d/flame_forge2d.dart';
-import 'package:flame/components.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:helm_demo/screens/welcome/cubit/mid_tag_line_cubit.dart';
+import 'package:helm_demo/screens/welcome/widgets/bodyComponents/custom_chip_shape.dart';
+import 'package:helm_demo/screens/welcome/widgets/bodyComponents/ground.dart';
+import 'package:helm_demo/screens/welcome/widgets/bodyComponents/left_wall.dart';
+import 'package:helm_demo/screens/welcome/widgets/bodyComponents/right_wall.dart';
 import 'package:logger/logger.dart';
 
 Logger log = Logger();
@@ -26,77 +29,52 @@ class FlameAnimation extends Forge2DGame {
     return const Color(0xFFFCE469);
   }
 
-  late List<Container> containers;
+  late List<CustomChipShape> customChipShapes;
   ValueNotifier<bool> isBuild = ValueNotifier(false);
+  double tag1IWidth = 100;
+  double tag2IWidth = 140;
+  double tag3IWidth = 110;
+  double tag4IWidth = 190;
+  double tag5Width = 180;
 
   @override
   asyn.FutureOr<void> onLoad() async {
     await super.onLoad();
 
-    containers = [
-      Container(
+    customChipShapes = [
+      CustomChipShape(
         conPosition: Vector2(50, -chipDropPoint),
         image: 'intro_tag_1.png',
-        iWidth: 100,
-        vertices: [
-          Vector2(-50, -26), // top left
-          Vector2(50, -26), // top right
-          Vector2(50, 26), // Bottom right
-          Vector2(-50, 26), // Bottom left
-        ],
+        iWidth: tag1IWidth,
         scHeight: scHeight,
       ),
-      Container(
+      CustomChipShape(
         conPosition: Vector2(170, -chipDropPoint),
         image: 'intro_tag_2.png',
-        iWidth: 140,
-        vertices: [
-          Vector2(-66, -25), // top left
-          Vector2(-66, 25), // Bottom left
-          Vector2(66, -25), // top right
-          Vector2(66, 25), // Bottom right
-        ],
+        iWidth: tag2IWidth,
         scHeight: scHeight,
       ),
-      Container(
-        conPosition: Vector2(50, -chipDropPoint),
+      CustomChipShape(
+        conPosition: Vector2(53, -chipDropPoint),
         image: 'intro_tag_3.png',
-        iWidth: 110,
-        vertices: [
-          Vector2(-56, -25), // top left
-          Vector2(56, -25), // top right
-          Vector2(56, 25), // Bottom right
-          Vector2(-56, 25), // Bottom left
-        ],
+        iWidth: tag3IWidth,
         scHeight: scHeight,
       ),
-      Container(
-        conPosition: Vector2(180, -chipDropPoint),
-        image: 'intro_tag_2.png',
-        iWidth: 140,
-        vertices: [
-          Vector2(-68, -26), // top left
-          Vector2(65, -24), // top right
-          Vector2(65, 26), // Bottom right
-          Vector2(-68, 26), // Bottom left
-        ],
+      CustomChipShape(
+        conPosition: Vector2(188, -chipDropPoint),
+        image: 'intro_tag_4.png',
+        iWidth: tag4IWidth,
         scHeight: scHeight,
       ),
-      Container(
+      CustomChipShape(
         conPosition: Vector2(240, -chipDropPoint),
-        image: 'intro_tag_2.png',
-        iWidth: 140,
-        vertices: [
-          Vector2(-60, -25), // top left
-          Vector2(-60, 25), // Bottom left
-          Vector2(70, -25), // top right
-          Vector2(70, 25), // Bottom right
-        ],
+        image: 'intro_tag_5.png',
+        iWidth: tag5Width,
         scHeight: scHeight,
       ),
     ];
 
-    int currentContainerIndex = 0;
+    int currentCustomChipShapeIndex = 0;
 
     Vector2 gameSize = Vector2(scWidth, scHeight);
 
@@ -109,13 +87,13 @@ class FlameAnimation extends Forge2DGame {
       (timer) async {
         if (kDebugMode) {
           print(
-            'currentIndex: $currentContainerIndex --> CurrentImage: ${containers[currentContainerIndex].image.toString()}',
+            'currentIndex: $currentCustomChipShapeIndex --> CurrentImage: ${customChipShapes[currentCustomChipShapeIndex].image.toString()}',
           );
         }
-        await add(containers[currentContainerIndex]);
-        currentContainerIndex++;
+        await add(customChipShapes[currentCustomChipShapeIndex]);
+        currentCustomChipShapeIndex++;
 
-        if (currentContainerIndex > 4) {
+        if (currentCustomChipShapeIndex > 4) {
           timer.cancel();
         }
       },
@@ -126,9 +104,9 @@ class FlameAnimation extends Forge2DGame {
   void update(double dt) async {
     super.update(dt);
     try {
-      for (var e in containers) {
+      for (var e in customChipShapes) {
         try {
-          if (e._isBodyInitialized && e.body.position.y > scHeight * 0.70) {
+          if (e.isBodyInitialized && e.body.position.y > scHeight * 0.70) {
             _updateBody(e);
             continue;
           }
@@ -136,9 +114,10 @@ class FlameAnimation extends Forge2DGame {
           log.i('Exception occurred for ${e.image}: $ex');
         }
 
-        if (containers.isNotEmpty &&
-            containers.last._isBodyInitialized &&
-            containers.last.body.position.y + containers.last.iWidth / 2 >
+        if (customChipShapes.isNotEmpty &&
+            customChipShapes.last.isBodyInitialized &&
+            customChipShapes.last.body.position.y +
+                    customChipShapes.last.iWidth / 2 >
                 (scHeight * 0.70)) {
           animCubit.animationEnded();
         }
@@ -148,173 +127,10 @@ class FlameAnimation extends Forge2DGame {
     }
   }
 
-  void _updateBody(Container con) {
+  void _updateBody(CustomChipShape con) {
     con.body.setType(BodyType.dynamic);
-    con.body.gravityOverride = Vector2(0, 1500);
+    con.body.gravityOverride = Vector2(0, 1000);
     con.body.fixtures.first.friction = 1;
     con.body.fixtures.first.restitution = 0;
-  }
-}
-
-class Container extends BodyComponent {
-  final Vector2 conPosition;
-  final String image;
-  final double iWidth;
-  final List<Vector2> vertices;
-  final double? scHeight;
-
-  Container({
-    required this.conPosition,
-    required this.image,
-    required this.iWidth,
-    required this.vertices,
-    this.scHeight,
-  });
-
-  double cusGravity = 5;
-  Vector2 velocity = Vector2(0, 20);
-  bool _isBodyInitialized = false;
-
-  @override
-  Future<void> onLoad() async {
-    await super.onLoad();
-    renderBody = false;
-
-    add(
-      SpriteComponent(
-        sprite: await Sprite.load(image),
-        size: Vector2(iWidth, 50),
-        anchor: Anchor.center,
-      ),
-    );
-    _isBodyInitialized = true;
-  }
-
-  @override
-  Body createBody() {
-    final shape = PolygonShape()..set(vertices);
-    final fixtureDef = FixtureDef(
-      shape,
-      friction: 1,
-      density: 1,
-      restitution: 0,
-    );
-    final bodyDef = BodyDef(
-      position: conPosition,
-      type: BodyType.static,
-    );
-    var body = world.createBody(bodyDef)..createFixture(fixtureDef);
-
-    return body;
-  }
-
-  @override
-  void update(double dt) {
-    super.update(dt);
-
-    velocity.y += cusGravity;
-
-    body.position.y += velocity.y * dt;
-
-    if (body.position.y > (scHeight! * 0.70)) {
-      Future.delayed(
-        const Duration(microseconds: 200),
-        () {
-          velocity.y = 0;
-          cusGravity = 0;
-        },
-      );
-    }
-  }
-}
-
-class Ground extends BodyComponent {
-  final Vector2 gameSize;
-  Ground(this.gameSize);
-
-  @override
-  Body createBody() {
-    final shape = EdgeShape()
-      ..set(
-        Vector2(0, gameSize.y),
-        Vector2(gameSize.x, gameSize.y),
-      );
-    final fixtureDef = FixtureDef(
-      shape,
-      friction: 1,
-      restitution: 0,
-    );
-    final bodyDef = BodyDef(
-      userData: this,
-      position: Vector2(0, 0),
-    );
-
-    return world.createBody(bodyDef)..createFixture(fixtureDef);
-  }
-
-  @override
-  void renderEdge(Canvas canvas, Offset p1, Offset p2) {
-    final paint = Paint()..color = const Color(0xFFFCE469);
-    canvas.drawLine(
-        Offset(0, gameSize.y), Offset(gameSize.x, gameSize.y), paint);
-  }
-}
-
-class LeftWall extends BodyComponent {
-  final Vector2 gameSize;
-  LeftWall(this.gameSize);
-
-  @override
-  Body createBody() {
-    final shape = EdgeShape()
-      ..set(
-        Vector2(0, 0),
-        Vector2(-1, gameSize.y),
-      );
-    final fixtureDef = FixtureDef(
-      shape,
-      friction: 1,
-    );
-    final bodyDef = BodyDef(
-      userData: this,
-      position: Vector2.zero(),
-    );
-    return world.createBody(bodyDef)..createFixture(fixtureDef);
-  }
-
-  @override
-  void renderEdge(Canvas canvas, Offset p1, Offset p2) {
-    final paint = Paint()..color = const Color(0xFFFCE469);
-    canvas.drawLine(const Offset(0, 0), Offset(-1, gameSize.y), paint);
-  }
-}
-
-class RightWall extends BodyComponent {
-  final Vector2 gameSize;
-  RightWall(this.gameSize);
-
-  @override
-  Body createBody() {
-    final shape = EdgeShape()
-      ..set(
-        Vector2(gameSize.x, 0),
-        Vector2(gameSize.x, gameSize.y),
-      );
-    final fixtureDef = FixtureDef(
-      shape,
-      friction: 1,
-    );
-    final bodyDef = BodyDef(
-      userData: this,
-      position: Vector2.zero(),
-    );
-    return world.createBody(bodyDef)..createFixture(fixtureDef);
-  }
-
-  @override
-  void renderEdge(Canvas canvas, Offset p1, Offset p2) {
-    final paint = Paint()..color = const Color(0xFFFCE469);
-    canvas.drawLine(
-        Offset(gameSize.x, 0), Offset(gameSize.x, gameSize.y), paint);
   }
 }
