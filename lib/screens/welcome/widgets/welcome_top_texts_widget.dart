@@ -11,13 +11,13 @@ class WelcomeTopTextsWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Image.asset(
-          'lib/assets/helm_logo.png',
+          'lib/assets/tree.png',
           height: 70,
           width: 70,
         ),
         const SizedBox(height: 10),
         const Text(
-          AppStrings.welcomeHelm,
+          AppStrings.welcome,
           style: AppTextStyles.title,
           maxLines: 2,
         ),

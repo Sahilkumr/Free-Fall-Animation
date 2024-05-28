@@ -25,7 +25,9 @@ class CustomChipShape extends BodyComponent {
   @override
   Future<void> onLoad() async {
     await super.onLoad();
+
     renderBody = false;
+    isBodyInitialized = true;
 
     add(
       SpriteComponent(
@@ -34,7 +36,6 @@ class CustomChipShape extends BodyComponent {
         anchor: Anchor.center,
       ),
     );
-    isBodyInitialized = true;
   }
 
   @override
@@ -51,38 +52,48 @@ class CustomChipShape extends BodyComponent {
       type: BodyType.static,
     );
     var body = world.createBody(bodyDef)..createFixture(fixtureDef);
-
     return body;
   }
 
   PolygonShape createShape() {
     final double halfWidth = iWidth / 2;
-
     final double cornerRadiusClamped = cornerRadius.clamp(0, halfWidth);
+    const double chipHeight = AppNumericConts.chipHeight;
 
     final List<Vector2> vertices = [
-      Vector2(-halfWidth + cornerRadiusClamped,
-          -AppNumericConts.chipHeight), // Bottom left
-      Vector2(halfWidth - cornerRadiusClamped,
-          -AppNumericConts.chipHeight), // Bottom right
       Vector2(
-          halfWidth,
-          -AppNumericConts.chipHeight +
-              cornerRadiusClamped), // Bottom right corner
-      Vector2(halfWidth,
-          AppNumericConts.chipHeight - cornerRadiusClamped), // Top right corner
-      Vector2(halfWidth - cornerRadiusClamped,
-          AppNumericConts.chipHeight), // Top right
-      Vector2(-halfWidth + cornerRadiusClamped,
-          AppNumericConts.chipHeight), // Top left
-      Vector2(-halfWidth,
-          AppNumericConts.chipHeight - cornerRadiusClamped), // Top left corner
+        -halfWidth + cornerRadiusClamped,
+        -chipHeight,
+      ), // Bottom left
       Vector2(
-          -halfWidth,
-          -AppNumericConts.chipHeight +
-              cornerRadiusClamped), // Bottom left corner
+        halfWidth - cornerRadiusClamped,
+        -AppNumericConts.chipHeight,
+      ), // Bottom right
+      Vector2(
+        halfWidth,
+        -AppNumericConts.chipHeight + cornerRadiusClamped,
+      ), // Bottom right corner
+      Vector2(
+        halfWidth,
+        AppNumericConts.chipHeight - cornerRadiusClamped,
+      ), // Top right corner
+      Vector2(
+        halfWidth - cornerRadiusClamped,
+        AppNumericConts.chipHeight,
+      ), // Top right
+      Vector2(
+        -halfWidth + cornerRadiusClamped,
+        AppNumericConts.chipHeight,
+      ), // Top left
+      Vector2(
+        -halfWidth,
+        AppNumericConts.chipHeight - cornerRadiusClamped,
+      ), // Top left corner
+      Vector2(
+        -halfWidth,
+        -AppNumericConts.chipHeight + cornerRadiusClamped,
+      ), // Bottom left corner
     ];
-
     final shape = PolygonShape()..set(vertices);
     return shape;
   }
@@ -92,12 +103,11 @@ class CustomChipShape extends BodyComponent {
     super.update(dt);
 
     velocity.y += cusGravity;
-
     body.position.y += velocity.y * dt;
 
     if (body.position.y > (scHeight! * 0.70)) {
       Future.delayed(
-        const Duration(microseconds: 200),
+        const Duration(microseconds: 500),
         () {
           velocity.y = 0;
           cusGravity = 0;

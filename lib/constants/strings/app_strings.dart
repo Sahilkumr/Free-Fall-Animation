@@ -1,8 +1,8 @@
 class AppStrings {
   //Welcome Screen
-  static const String welcomeHelm = 'Welcome to Helm!';
-  static const String welcomeTo = 'The Creator Hub';
+  static const String welcome = 'Welcome to Trees!';
+  static const String welcomeTo = 'The Mother Earth';
   static const String welcomeToSubText =
-      'Effieciently manage tasks & interact with clients seamlessly.';
-  static const String middleTagLine = 'All features in single App!';
+      'Grow More for Green Future';
+  static const String middleTagLine = 'Greenery is Not away!';
 }
